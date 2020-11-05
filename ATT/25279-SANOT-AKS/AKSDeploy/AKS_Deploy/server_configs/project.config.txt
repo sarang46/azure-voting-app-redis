@@ -1,0 +1,17 @@
+const {permissionThatUserShouldHave} = require('./user.permission')
+
+
+const prop = {
+    permissionThatUserShouldHave,
+    frameWork : 'express', // Select FramWork hapi or express.
+    env : 'dev', // Select env prod or dev.
+    secretKey : 'test', // assign a secretKey that will be used to validate when a token is created.
+    expTokenIn : 5, // Set Token expiration in minutes. For this example we have set the token to expire in 5 minutes.
+    macid : '',
+    password : '',
+    limitNumberOfHits: 150, // Allow 150 requests per hour
+    limitTimeFrame: 'hour', // Also understands 'second', 'minute', 'hour', 'day', or a number of milliseconds
+    cspURLdev: '' // example: https://webtest.stage.att.com/empsvcs/hrpinmgt/pagLogin/
+}
+
+module.exports = {prop}

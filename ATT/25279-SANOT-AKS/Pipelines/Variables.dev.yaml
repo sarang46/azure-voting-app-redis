@@ -1,0 +1,66 @@
+# -----------------------------------------------------------------------------
+# .SYNOPSIS
+#   This is the pipeline variables template yaml for the dev environment.
+# .DESCRIPTION
+#   This pipeline contains all common variables referenced in main pipeline.
+
+# .ASSUMPTIONS:
+#     1. You are referencing this template from an ado pipeline
+#        under the variables object.
+
+# .NOTES
+#     File Name      : variables.dev.yaml
+#     Prerequisite   : ADO Multi-Stage Yaml Pipeline
+
+# General Variables ----------
+
+# .VARIABLE repoPath
+#   Name of the jumpstart kit being used
+# .VARIABLE serviceConnectionVPBackend
+#   Name of the service connection
+# .VARIABLE serviceConnectionApp
+#   Name of the service connection for the application subscription
+# .VARIABLE appSPNObjectId
+#   Object ID of the application SPN (this is found in the enterprise application section of Azure AD)
+#   To obtain this, find the service connection in ADO, click on "Manage Service Principal" then the link under "Managed application in local directory" and copy the object ID from here.
+# .VARIABLE k8s_rg_name
+#   Name of resource group in which kubernetes will be deployed
+# .VARIABLE k8s_cluster_name
+#   Name of the kubernetes cluster
+# .VARIABLE acr_name
+#   Name of the azure container registry
+# .VARIABLE secret_name
+#   name of the image pull secret  
+# -----------------------------------------------------------------------------
+
+variables:
+  - name: motsId
+    value: "25279"
+#Service Connection variables
+  - name: serviceConnectionApp
+    value: ATTDevOps_Service_Connection_For_SANOT_NPRD
+#k8s variables    
+  - name: k8s_rg_name
+    value: sanot-eastus2-test-rg-01
+
+  - name: k8s_cluster_name
+    value: sanot-25279-test-AKScluster
+
+#azure container regisry name  
+  - name: acr_name
+    value: 25279devopsacr
+
+#image pull secret name
+  - name: secret_name
+    value: acr-secret1
+
+# SP Creds
+  - name: client_id
+    value: nprdclientid
+  
+  - name: secret_id
+    value: nprdsecretid
+
+  - name: keyvault_name
+    value: devops-kv-25279           # 28363
+

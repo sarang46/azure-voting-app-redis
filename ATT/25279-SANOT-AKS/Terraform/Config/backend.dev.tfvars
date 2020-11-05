@@ -1,0 +1,5 @@
+resource_group_name  = "25279-eastus2-devops-rg"
+storage_account_name = "25279devopsstdgatt001"
+container_name       = "terraform-aks"
+key                  = "sanotnprd01"
+region               = "eastus2"

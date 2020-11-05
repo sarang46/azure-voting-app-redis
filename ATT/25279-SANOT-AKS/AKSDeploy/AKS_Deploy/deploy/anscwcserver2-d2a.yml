@@ -1,0 +1,93 @@
+apiVersion: extensions/v1beta1 
+kind: Deployment 
+metadata: 
+  generation: 1 
+  labels:
+    app: AnscWcServer2 
+    routeoffer: D2A 
+    version: 1.18.0 
+  name: anscwcserver2-d2a
+spec: 
+  minReadySeconds: 120 
+  progressDeadlineSeconds: 2147483647 
+  replicas: 1 
+  revisionHistoryLimit: 0 
+  selector: 
+    matchLabels: 
+      app: AnscWcServer2 
+      routeoffer: D2A 
+      version: 1.18.0 
+  strategy: 
+    rollingUpdate: 
+      maxSurge: 50% 
+      maxUnavailable: 50% 
+    type: RollingUpdate 
+  template: 
+    metadata: 
+      creationTimestamp: null 
+      labels:
+        app: AnscWcServer2 
+        routeoffer: D2A 
+        version: 1.18.0 
+    spec: 
+      containers: 
+      - env: 
+        - name: APP_VERSION 
+          value: 1.18.0 
+        - name: TARGET_ENV 
+          value: DEV 
+        - name: COOKIE_SERVER 
+          valueFrom: 
+            secretKeyRef: 
+              key: COOKIE_SERVER 
+              name: anscwcserver-secret 
+        - name: COOKIE_SERVER_PORT 
+          valueFrom: 
+            secretKeyRef: 
+              key: COOKIE_SERVER_PORT 
+              name: anscwcserver-secret 
+        - name: db_user 
+          valueFrom: 
+            secretKeyRef: 
+              key: db_user 
+              name: anscwcserver-secret 
+        - name: db_password 
+          valueFrom: 
+            secretKeyRef: 
+              key: db_password 
+              name: anscwcserver-secret 
+        - name: db_url 
+          valueFrom: 
+            secretKeyRef: 
+              key: db_url 
+              name: anscwcserver-secret 
+        - name: db_port 
+          valueFrom: 
+            secretKeyRef: 
+              key: db_port 
+              name: anscwcserver-secret 
+        - name: db_sid 
+          valueFrom: 
+            secretKeyRef: 
+              key: db_sid 
+              name: anscwcserver-secret 
+        - name: db_name 
+          valueFrom: 
+            secretKeyRef: 
+              key: db_name 
+              name: anscwcserver-secret
+        image: 29624wfepocacr.azurecr.io/com.att.wfecst/anscwcserver2:1.17.0
+        imagePullPolicy: Always 
+        name: anscwcserver2 
+        ports: 
+        - containerPort: 3001 
+          name: http 
+          protocol: TCP 
+        resources: {} 
+        terminationMessagePath: /dev/termination-log 
+        terminationMessagePolicy: File 
+      dnsPolicy: ClusterFirst 
+      restartPolicy: Always 
+      schedulerName: default-scheduler 
+      securityContext: {} 
+      terminationGracePeriodSeconds: 30

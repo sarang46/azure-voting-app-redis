@@ -1,0 +1,39 @@
+# -----------------------------------------------------------------------------
+# General Vartiables ---
+
+# .VARIABLE LOCATION
+#   Location of the Azure Resources
+
+# DevOps Services Variables ----
+
+# .VARIABLE ci_sa_name
+#   The ci storage account name in vp shared services
+# .VARIABLE dest_sig_rg
+#   The destination shared image gallery resource group in vp shared services
+# .VARIABLE dest_sig
+#   The destination shared image gallery in vp shared services
+# .VARIABLE vp_base_rg
+#   The base resource group in vp shared services. This rg will contain the virtual network
+# .VARIABLE vp_vnet
+#   The virtual network in vp shared services
+# .VARIABLE vp_packer_subnet
+#   The subnet in vp shared services to deploy the temporary packer vm provioner
+# .VARIABLE vp_packer_rg
+#   The resource group to place the custom image in vp shared services
+# -----------------------------------------------------------------------------
+variables:
+ # general variables
+  - name: LOCATION
+    value: eastus2
+  - name: agent_pool
+    value: sanot-agent-aks
+  - name: motsId
+    value: "25279"
+
+# DevOps Services variables ------------------------------------------
+  - name: ci_sa_name
+    value: $(motsId)devopsstdgatt01
+
+# image builder variables ---------------------------------------------------
+  - name: image_builder
+    value: false # <--- OPTIONAL, SET TO ENABLE/DISABLE IMAGE BUILDER TASKS

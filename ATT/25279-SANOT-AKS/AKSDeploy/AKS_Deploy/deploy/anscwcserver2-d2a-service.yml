@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: anscwcserver2-d2a
+  namespace: default
+  labels:
+    app: AnscWcServer2
+    version: 1.18.0
+    routeoffer: D2A
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3001
+  selector:
+    app: AnscWcServer2
+    version: 1.18.0
+    routeoffer: D2A

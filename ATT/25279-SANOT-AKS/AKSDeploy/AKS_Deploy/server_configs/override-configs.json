@@ -1,0 +1,77 @@
+{
+  "appName": "anscexpress0802002",
+  "version":"v1",
+  "NODE_ENV" : "development",
+  "server":"express",
+  "logging" : "",
+  "AFTDiscoveryHostList" : [ "http://aftdsp01.it.att.com",
+    "http://aftdsp02.it.att.com", "http://aftdsp03.it.att.com",
+    "http://aftdsp04.it.att.com", "http://aftdsp05.it.att.com",
+    "http://aftdsp06.it.att.com", "http://aftdsp07.it.att.com",
+    "http://aftdsp08.it.att.com", "http://aftdsp09.it.att.com" ],
+  "CSI_Audit_Log_Queue":"/DirectDiscoveryOneWay?service^m2e.dashboard&version^1.0&bindingType^fusionBus&dataContext^PEXT&serviceEnvironment^P",
+  "Performance_Log_Queue":"/DirectDiscoveryOneWay?service^m2e.performance&version^1.0&bindingType^fusionBus&dataContext^PEXT&serviceEnvironment^P",
+  "CSI_Audit_Log_Queue_PassPhrase":"0ffR@mp",
+  "Performance_Log_Queue_PassPhrase":"0ffR@mp",
+  "CSI_Audit_Log_Queue_KeyFilePath":"./m67736r.pem",
+  "Performance_Log_Queue_KeyFilePath":"./m67736r.pem",
+  "CSI_Audit_Log_Queue_CertFilePath":"./m67736r.pem",
+  "Performance_Log_Queue_CertFilePath":"./m67736r.pem",
+  "unitTestLogFilePath":"../test/logs",
+  "csiEnable":"true",
+  "throttleLimit":"150",
+  "logFilePath":"/logs",
+  "loggingLevel":"DEBUG",
+  "logsPrintFormat":"",
+  "enableRequestLog":false,
+  "enableResponseLog":false,
+  "enablePerformanceLog":false,
+  "enablePhoneInEvents":true,
+  "enableBusinessEvents":true,
+  "motsApplicationAcronym": "ANSC",
+  "SPIData":["username", "password"],
+  "infoLogFileName":"ansc-info.log",
+  "errorLogFileName":"ansc-error.log",
+  "debugLogFileName":"ansc-debug.log",
+  "warnLogFileName":"ansc-warn.log",
+  "fatalLogFileName":"ansc-fatal.log",
+  "QUALITY_GATE": {
+  "QG2": {
+  "TEST_TYPE": "Component Test",
+  "LEVEL": "QG2",
+  "PASS_PERCENT": "80"
+  },
+  "QG3": {
+  "TEST_TYPE": "Contract Generate",
+  "LEVEL": "QG3",
+  "PASS_PERCENT": "100"
+  },
+  "QG4": {
+  "TEST_TYPE": "Contract Verify",
+  "LEVEL": "QG4",
+  "PASS_PERCENT": "100"
+  },
+  "QG5": {
+  "TEST_TYPE": "Contract Verify QA",
+  "LEVEL": "QG5",
+  "PASS_PERCENT": "100"
+  },
+  "QG6": {
+  "TEST_TYPE": "QA Test",
+  "LEVEL": "QG6",
+  "PASS_PERCENT": "100"
+  },
+  "QG7": {
+  "TEST_TYPE": "QA E2E",
+  "LEVEL": "QG7",
+  "PASS_PERCENT": "100"
+  }
+  },
+  "UNIT_TESTSUITE":{"SKIP": true, "SUITE_NAME": ["SampleTestSuite"]},
+  "COMPONENT_TESTSUITE":{"SKIP": true, "SUITE_NAME": ["ComponentTestSuite"]},
+  "CONTRACT_TESTSUITE":{"SKIP": true, "SUITE_NAME": ["PactTestSuite"]},
+  "SYSTEM_INTEGRATION_TESTSUITE":{"SKIP": false, "SUITE_NAME": []},
+  "PERFORMANCE_TESTSUITE":{"SKIP": false, "SUITE_NAME": []},
+  "SECURITY_TESTSUITE":{"SKIP": false, "SUITE_NAME": []},
+  "RESILIENCY_TESTSUITE":{"SKIP": false, "SUITE_NAME": []}
+}

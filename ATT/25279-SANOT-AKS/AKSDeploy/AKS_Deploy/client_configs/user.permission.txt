@@ -1,0 +1,3 @@
+const permissionThatUserShouldHave = ['com.att.ajsc.routes']
+
+module.exports = {permissionThatUserShouldHave};

@@ -1,0 +1,23 @@
+const {permissionThatUserShouldHave} = require('./user.permission')
+const _mechid = process.env.MECHID || '';
+const decrypter = require(process.cwd() + "/utils/passwordDecryption");
+const isPasswordEncrypted = process.env.IS_PASSWORD_ENCRYPTED || "notEncrypted";
+var _password
+
+if (isPasswordEncrypted === "encrypted") {
+    const _encrypted_password = process.env.MECHID_PASSWORD || '';
+    //the path may need to change.
+    _password = decrypter(_encrypted_password, './secrets/key.pem');
+} else {
+    _password = process.env.MECHID_PASSWORD || '';
+}
+const prop = {
+    permissionThatUserShouldHave,
+    frameWork : 'express', // Select FramWork hapi or express.
+    env : 'dev', // Select env prod or dev.
+    mechid : _mechid, //mechid@namespace.att.com
+    password : _password, //mechid aaf password
+    cspDevUrl: '' // optional. example: https://webtest.stage.att.com/empsvcs/hrpinmgt/pagLogin/
+}
+
+module.exports = {prop}

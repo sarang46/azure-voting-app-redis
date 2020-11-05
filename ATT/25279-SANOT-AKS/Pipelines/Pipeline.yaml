@@ -1,0 +1,122 @@
+# -----------------------------------------------------------------------------
+# .SYNOPSIS
+#   This pipeline is the main pipeline that contains the top level stages for the deployment
+# using other YAML templates as references both locally and from the common library
+# .DESCRIPTION
+#   This pipeline will:
+#  1. Add the common-library for shared pipeline references, which include
+#     a. YAML references for Image Builder to deploy custom images and / or containers
+#     b. YAML references for Terraform Init, Plan, and Apply, which contain references to common bash scripts
+
+# .ASSUMPTIONS:
+#     1. Looping is not needed for environment stages due to different parameters per environment
+#     2. Terraform steps are the same across all projects (setup, init, plan, apply)
+
+# .NOTES
+#     File Name      : pipelines.yaml
+#     Prerequisite   : ADO Multi-Stage Yaml Pipeline
+
+# .VARAIBLE_NAMING_CONVENTION
+#   sig = shared image gallery
+#   rg = resource group
+#   dest = destination
+#   sa = storage account
+
+#   SERVICE-CONNECTION
+#     This is the name of the azure devops service connection
+
+# -----------------------------------------------------------------------------
+
+name: HGPHS-Preprod-aks-$(version).$(Rev:rr)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+    - users/*
+  paths:
+    exclude: 
+      - /**/*.md
+      - /.attachments
+
+# release wide variables
+variables:
+  - name: version
+    value: 0.5
+
+  - template: Variables.yaml
+  - name: system.debug 
+    value: true
+
+resources:
+  repositories:
+    - repository: common-library
+      type: git
+      name: ATT Cloud/common-library
+      ref: refs/tags/v0.5.0
+      endpoint: ATTDevOps_Service_Connection_For_SANOT
+
+#comment out line 53-59 if not planning to use image builder resource
+#  pipelines:
+#  - pipeline: 29624-WFE-CAST #<--- Alias to use when referencing this resource
+    # source: WfeImageBuilder #<--- Verify source matches name of image builder pipeline
+    # trigger:
+    #   branches:
+    #     include:
+    #     - master
+
+pool: $(agent_pool)
+
+stages:
+- stage: DEV
+  displayName: DEV
+  variables:
+  - template: /Pipelines/Variables.dev.yaml
+  jobs:
+    - template: /Pipelines/Stage.yaml
+      parameters:
+        serviceConnectionApp: ${{ variables.serviceConnectionApp }}
+        environment: dev
+        k8s_rg_name:  ${{ variables.k8s_rg_name}}
+        k8s_cluster_name: ${{ variables.k8s_cluster_name}}
+        acr_name: ${{ variables.acr_name}}
+        secret_name: ${{ variables.secret_name}}
+        client_id: ${{ variables.client_id}}
+        secret_id: ${{ variables.secret_id}}
+        keyvault_name: ${{ variables.keyvault_name}}
+      
+# - stage: QA
+#   displayName: QA
+#   variables:
+#   - template: /Pipelines/Variables.qa.yaml
+#   dependsOn: DEV
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   jobs:
+#     - template: /Pipelines/Stage.yaml
+#       parameters:
+#         serviceConnectionApp: ${{ variables.serviceConnectionApp }}
+#         environment: qa
+#         k8s_rg_name:  ${{ variables.k8s_rg_name}}
+#         k8s_cluster_name: ${{ variables.k8s_cluster_name}}
+#         acr_name: ${{ variables.acr_name}}
+#         secret_name: ${{ variables.secret_name}}
+
+# - stage: PROD
+#   displayName: PROD
+#   variables:
+#   - template: /Pipelines/Variables.prod.yaml
+#   # dependsOn: QA
+#   # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   jobs:
+#     - template: /Pipelines/Stage.yaml
+#       parameters:
+#         serviceConnectionApp: ${{ variables.serviceConnectionApp }}
+#         environment: prod
+#         k8s_rg_name:  ${{ variables.k8s_rg_name}}
+#         k8s_cluster_name: ${{ variables.k8s_cluster_name}}
+#         acr_name: ${{ variables.acr_name}}
+#         secret_name: ${{ variables.secret_name}}
+#         client_id: ${{ variables.client_id}}
+#         secret_id: ${{ variables.secret_id}}
+#         keyvault_name: ${{ variables.keyvault_name}}

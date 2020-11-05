@@ -1,0 +1,5 @@
+resource_group_name  = "29624-eastus2-devops-rg"
+storage_account_name = "29624devopsstdgatt01"
+container_name       = "adotfstate"
+key                  = "nprdaksado.tfstate"
+region               = "eastus2"

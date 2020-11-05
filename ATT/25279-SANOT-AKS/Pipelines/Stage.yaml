@@ -1,0 +1,189 @@
+parameters:
+- name: serviceConnectionApp
+  type: string
+  displayName: 'The Service Connection to run Terraform'
+
+- name: environment
+  type: string
+  displayName: 'The environment name'
+
+- name: k8s_rg_name
+  type: string 
+  displayName: 'rg name in which k8s is going to be deployed'
+  default: ''
+
+- name: k8s_cluster_name
+  type: string
+  displayName: 'name of the kubernets cluster'
+  default: ''
+
+- name: acr_name
+  type: string
+  displayName: 'name of the azure container registry for creating image pull secret'
+  default: ''
+
+- name: secret_name
+  type: string
+  displayName: 'name of the image pull secret'
+  default: ''
+
+- name: client_id
+  type: string
+  displayName: 'SP Client ID for AKS'
+  default: ''
+
+- name: secret_id
+  type: string
+  displayName: 'SP Secret ID for AKS'
+  default: ''
+
+- name: keyvault_name
+  type: string
+  displayName: 'Kayvault to get client and secret ids'
+  default: ''
+
+- name: dependsOn
+  type: string
+  displayName: 'The components this job depends on like another job'
+  default: ''
+
+jobs:
+- deployment: ${{ parameters.environment }}
+  dependsOn: ${{ parameters.dependsOn }}
+  displayName: Deploy
+  environment: ${{ parameters.environment }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+        - checkout: common-library
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Pipeline Artifact'
+          condition: and(succeeded(), eq(variables['image_builder'], 'true'))
+          inputs:
+            source: specific
+            project: '28363-HGPHS' # <--- CHANGE TO YOUR ADO PROJECT NAME
+            pipeline: 24595 # <-- CHANGE TO YOUR IMAGE BUILDER PIPELINE DEFINITION ID
+            preferTriggeringPipeline: true
+            buildVersionToDownload: 'specific'
+            runId:  $(resources.pipeline.28363-HGPHS.runID) #<-- VERIFY ALIAS MATCHES RESOURCE NAME SET ON PIPELINE.YAML
+            path: $(Build.ArtifactStagingDirectory)
+
+        - task: CopyFiles@2
+          displayName: "Copy tfvars"
+          condition: and(succeeded(), eq(variables['image_builder'], 'true'))
+          inputs:
+            sourceFolder: $(Build.ArtifactStagingDirectory)
+            contents: '*.artifact/*.auto.tfvars'
+            targetFolder: $(Build.Repository.Name)/Terraform
+            flattenFolders: true
+
+        - script: |
+
+              cd "$(Build.Repository.Name)/Terraform"
+              echo "auto.tfvars contents:"
+              cat *.auto.tfvars 
+  
+          displayName: "Display tfvars"
+          condition: and(succeeded(), eq(variables['image_builder'], 'true'))
+
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: ${{ parameters.serviceConnectionApp }}
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              PWD1=`az keyvault secret show --name ${{ parameters.client_id }} --vault-name ${{ parameters.keyvault_name }} --query value | tr -d '"'`
+              PWD2=`az keyvault secret show --name ${{ parameters.secret_id }} --vault-name ${{ parameters.keyvault_name }} --query value | tr -d '"'`
+              echo "client_id=\"${PWD1}\"" > $(Build.Repository.Name)/Terraform/secrets.auto.tfvars
+              echo "client_secret=\"${PWD2}\"" >> $(Build.Repository.Name)/Terraform/secrets.auto.tfvars
+              cat $(Build.Repository.Name)/Terraform/secrets.auto.tfvars 
+            addSpnToEnvironment: true
+          displayName: Get SPN for AKS from Key vault 
+          
+        - template: PipelineTemplates/Terraform/Terraform.yaml@common-library
+          parameters:
+            serviceConnectionApp: ${{ parameters.serviceConnectionApp }}
+            environment: ${{ parameters.environment }}
+
+        # - task: AzureCLI@2
+        #   displayName: Kubectl commands
+        # #Use this task to deploy, configure, or update a Kubernetes cluster by running kubectl commands
+        # #you can add the required kubectl commands at inlinescript  
+        #   inputs:
+        #     azureSubscription: ${{ parameters.serviceConnectionApp }}
+        #     addSpnToEnvironment: true
+        #     scriptType: bash
+        #     scriptLocation: inlineScript
+        #     inlineScript: |
+        #       az aks get-credentials --name ${{ parameters.k8s_cluster_name }} --resource-group ${{ parameters.k8s_rg_name }}
+               
+
+        # - task: Kubernetes@1
+        #   displayName: kubectl create image pull secret
+        #   inputs:
+        #     connectionType: Azure Resource Manager
+        #     azureSubscriptionEndpoint: ${{ parameters.serviceConnectionApp }}
+        #     azureResourceGroup: ${{ parameters.k8s_rg_name }}
+        #     kubernetesCluster: ${{ parameters.k8s_cluster_name }}
+        #     #namespace: web
+        # # un comment below lines to Use Kubernetes configuration files with the kubectl command. Reference : https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/kubernetes?view=azure-devops#secrets 
+        #     #command: apply
+        #     #useConfigurationFile: true
+        #     #configuration: '$(System.DefaultWorkingDirectory)/$(Build.Repository.Name)/Terraform/Config/k8s_deployment.yaml'
+        #     containerRegistryType: Azure Container Registry
+        #     azureSubscriptionEndpointForSecrets: ${{ parameters.serviceConnectionApp }}
+        #     azureContainerRegistry: ${{ parameters.acr_name }}
+        #     secretName: ${{ parameters.secret_name }}
+
+        # Other Samples
+        # - task: HelmDeploy@0
+        #   displayName: Helm install
+        #   inputs:
+        #     azureSubscriptionEndpoint: ${{ parameters.serviceConnectionApp }}
+        #     azureResourceGroup: ${{ parameters.k8s_rg_name }}
+        #     kubernetesCluster: ${{ parameters.k8s_cluster_name }}
+        #     command: install
+        #     chartType: FilePath
+        #     chartPath: '$(System.DefaultWorkingDirectory)/$(Build.Repository.Name)/charts/sampleapp' 
+             
+        # - task: AzureCLI@2
+        #   displayName: Kubectl Sample
+        #   inputs:
+        #     azureSubscription: ${{ parameters.serviceConnectionApp }}
+        #     addSpnToEnvironment: true
+        #     scriptType: bash
+        #     scriptLocation: inlineScript
+        #     inlineScript: |
+        #       az aks get-credentials --name jstartaks91748 --resource-group jstartaks91742
+        #       kubectl create secret docker-registry acrsecret \
+        #          --namespace default \
+        #          --docker-server=https://tftestacr2020.azurecr.io \
+        #          --docker-username=xxxxxxxx \
+        #          --docker-password=xxxxxxxx
+
+
+        ####################################### OLD #######################################
+        #       az aks get-credentials --name jstartvmss05192020a --resource-group jstartvmss05192020a
+        #       aks get nodes
+
+              # https://cert-manager.io/docs/installation/kubernetes/
+              # kubectl create namespace cert-manager
+              # helm repo add jetstack https://charts.jetstack.io
+              # helm repo update
+              # kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.0/cert-manager.crds.yaml
+              # helm install \
+              #   cert-manager jetstack/cert-manager \
+              #   --namespace cert-manager \
+              #   --version v0.15.0 \
+              #   # --set installCRDs=true
+
+              # # Helm v2
+              # helm install \
+              #   --name cert-manager \
+              #   --namespace cert-manager \
+              #   --version v0.15.0 \
+              #   jetstack/cert-manager \
+              #   # --set installCRDs=true
+              # kubectl get pods --namespace cert-manager

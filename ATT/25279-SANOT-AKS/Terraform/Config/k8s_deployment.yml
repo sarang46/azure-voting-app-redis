@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-awesome-app-pod
+spec:
+  containers:
+    - name: main-app-container
+      image: acrtestnew2023.azurecr.io/sample/hello-world:v1
+      imagePullPolicy: IfNotPresent
+  imagePullSecrets:
+    - name: acr-secret1

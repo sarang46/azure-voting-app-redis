@@ -1,0 +1,21 @@
+{
+  "appName": "{{ANS_app_name}}",
+  "servicename": "{{ANS_app_name}}",
+  "version":"v1",
+  "namespace":"{{ANS_NAMESPACE}}",
+  "servicenamespace":"{{ANS_NAMESPACE}}",
+  "image": "{{ANS_imagename}}",
+  "instance": "{{ANS_app_name}}",
+  "NODE_ENV": "development",
+  "server":"express",
+  "logging" : "1t-logging",
+  "loggingLevel":"DEBUG",
+  "logsPrintFormat":"",
+  "enableRequestLog":false,
+  "enableResponseLog":false,
+  "enablePerformanceLog":false,
+  "enablePhoneInEvents":true,
+  "enableBusinessEvents":true,
+  "motsApplicationAcronym": "change_me",
+  "SPIData":["username", "password","authorization","cookie"]
+}
